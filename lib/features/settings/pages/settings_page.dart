@@ -7,21 +7,46 @@ import 'package:task_manager_app/core/services/storage_service.dart';
 import '../../../core/widgets/profile_bubble.dart';
 import 'theme_settings_page.dart';
 import 'notification_settings_page.dart';
-import 'habit_settings_page.dart'; // <--- UNCOMMENTED
+import 'habit_settings_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   Future<void> _handleSignOut(BuildContext context) async {
-    // FIX: Changed from closeBoxes() to closeUserBoxes()
     await StorageService.instance.closeUserBoxes();
     await AuthService.instance.signOut();
+  }
+
+  // --- NEW: Handle Sign In from Settings ---
+  Future<void> _handleSignIn(BuildContext context) async {
+    try {
+      final user = await AuthService.instance.signInWithGoogle();
+      if (user != null) {
+        // Since the user is now authenticated, the AuthWrapper stream
+        // will automatically detect the change and rebuild the app,
+        // loading their specific database ID.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Successfully Signed In!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<AppColors>()!;
     final user = AuthService.instance.currentUser;
+    final bool isGuest = user == null; // Determine if user is in Guest Mode
 
     return Scaffold(
       backgroundColor: colors.bgMain,
@@ -44,24 +69,34 @@ class SettingsPage extends StatelessWidget {
                           // 1. Profile Bubble (Displays Name internally)
                           ProfileBubble(
                             colors: colors,
-                            userName: user?.displayName ?? "User",
-                            // Removed 'showName' and 'radius' to match existing widget
+                            userName: isGuest
+                                ? "Guest User"
+                                : user.displayName ?? "User",
                           ),
-
-                          // 2. Removed Duplicate Name Text
-                          // The ProfileBubble already shows the name, so we removed the
-                          // extra Text widget here to prevent repetition.
 
                           const SizedBox(height: 5),
 
-                          // 3. Email Display
+                          // 2. Email Display OR Guest Prompt
                           Text(
-                            user?.email ?? "",
+                            isGuest ? "Local Offline Mode" : user.email ?? "",
                             style: TextStyle(
                               color: colors.textSecondary,
                               fontSize: 14,
                             ),
                           ),
+
+                          // Optional: Add a subtle prompt for guests to backup data
+                          if (isGuest) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              "Sign in to backup your data to the cloud.",
+                              style: TextStyle(
+                                color: colors.highlight,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ]
                         ],
                       ),
                     ),
@@ -96,7 +131,7 @@ class SettingsPage extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // PAGES (NEW SECTION)
+                    // PAGES
                     _buildSectionHeader("Pages", colors),
                     _buildTile(
                       icon: Icons.repeat,
@@ -113,14 +148,23 @@ class SettingsPage extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // ACCOUNT
+                    // ACCOUNT - Dynamic Button
                     _buildSectionHeader("Account", colors),
-                    _buildTile(
-                      icon: Icons.logout,
-                      title: "Sign Out",
-                      colors: colors,
-                      onTap: () => _handleSignOut(context),
-                    ),
+                    if (isGuest)
+                      _buildTile(
+                        icon: Icons.login,
+                        title: "Sign In with Google",
+                        colors: colors,
+                        onTap: () => _handleSignIn(context),
+                      )
+                    else
+                      _buildTile(
+                        icon: Icons.logout,
+                        title: "Sign Out",
+                        colors: colors,
+                        onTap: () => _handleSignOut(context),
+                      ),
+
                     // Add extra padding so the nav bar doesn't block the last item
                     const SizedBox(height: 120),
                   ],

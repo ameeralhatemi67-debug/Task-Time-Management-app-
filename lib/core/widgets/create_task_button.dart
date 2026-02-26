@@ -63,14 +63,19 @@ class _CreateTaskButtonState extends State<CreateTaskButton>
       return;
     }
 
-    setState(() {
+    /* setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
         _hubController.forward();
       } else {
         _hubController.reverse();
       }
-    });
+    }); */
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => const SmartAddSheet(),
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent);
     HapticFeedback.mediumImpact();
   }
 
@@ -162,7 +167,7 @@ class _CreateTaskButtonState extends State<CreateTaskButton>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // 1. THE 6 OPTION ICONS
+                          /* 1. THE 6 OPTION ICONS
                           Expanded(
                             child: FadeTransition(
                               opacity: _expandAnimation,
@@ -205,7 +210,7 @@ class _CreateTaskButtonState extends State<CreateTaskButton>
                                 ],
                               ),
                             ),
-                          ),
+                          ), */
 
                           // 2. THE MAIN TRIGGER ICON
                           SizedBox(

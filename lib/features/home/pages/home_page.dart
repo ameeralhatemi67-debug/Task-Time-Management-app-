@@ -139,11 +139,13 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               children: [
                 // Hamburger Menu Icon
+                /*
                 IconButton(
                   icon: Icon(Icons.menu, color: colors.textMain),
                   onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                 ),
                 const SizedBox(width: 10),
+                */
                 Text(
                   // Optional: Show Folder Name in Title
                   _currentFolderId == 'all_folders'
@@ -162,9 +164,11 @@ class _HomePageState extends State<HomePage> {
           ),
 
           // 2. MAIN CONTENT
+          /*
           Expanded(
             child: ThemeTestView(pageName: "Home Page - $_currentFolderId"),
           ),
+          */
         ],
       ),
       floatingActionButton: Padding(

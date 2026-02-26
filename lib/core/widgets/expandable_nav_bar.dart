@@ -33,9 +33,9 @@ class PrimaryNavBar extends StatelessWidget {
 
     // The fixed list of 6 items
     final items = [
-      NavItem.home,
       NavItem.tasks,
       NavItem.habits,
+      NavItem.home,
       NavItem.focus,
       NavItem.notes,
       NavItem.settings,

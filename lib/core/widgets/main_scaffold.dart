@@ -19,7 +19,7 @@ class MainScaffold extends StatefulWidget {
 
 class _MainScaffoldState extends State<MainScaffold> {
   // Default Page is Home
-  NavItem _currentItem = NavItem.home;
+  NavItem _currentItem = NavItem.tasks;
 
   // State to track UI overlays
   bool _isInnerDrawerOpen = false;
@@ -33,18 +33,18 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   Widget _getPage(NavItem item) {
     switch (item) {
-      case NavItem.home:
-        return HomePage(
-          onDrawerChanged: (isOpen) =>
-              setState(() => _isInnerDrawerOpen = isOpen),
-        );
-
       case NavItem.tasks:
         return TasksPage(
           onDrawerChanged: (isOpen) =>
               setState(() => _isInnerDrawerOpen = isOpen),
           onSelectionModeChanged: (isSelecting) =>
               setState(() => _isSelectionMode = isSelecting),
+        );
+
+      case NavItem.home:
+        return HomePage(
+          onDrawerChanged: (isOpen) =>
+              setState(() => _isInnerDrawerOpen = isOpen),
         );
 
       case NavItem.habits:

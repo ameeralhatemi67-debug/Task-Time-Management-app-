@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -8,11 +9,22 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  // --- NEW: Guest State Management ---
+  final _guestStateController = StreamController<bool>.broadcast();
+
+  // Expose guest stream
+  Stream<bool> get guestStateChanges => _guestStateController.stream;
+
   // Stream to listen to auth state (Logged In vs Logged Out)
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   // Current User Helper
   User? get currentUser => _auth.currentUser;
+
+  // --- NEW: Enter Guest Mode ---
+  void enterGuestMode() {
+    _guestStateController.add(true); // Signal the wrapper to let them in
+  }
 
   // Sign In Logic
   Future<User?> signInWithGoogle() async {
@@ -35,6 +47,7 @@ class AuthService {
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
+      _guestStateController.add(false); // Reset guest state on successful login
       return userCredential.user;
     } catch (e) {
       print("Error signing in with Google: $e");
@@ -46,5 +59,6 @@ class AuthService {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
+    _guestStateController.add(false); // Reset guest state on logout
   }
 }

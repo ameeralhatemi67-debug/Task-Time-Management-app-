@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart'; // <-- ADDED: For debugPrint
 import 'package:task_manager_app/core/services/notification_service.dart';
 import 'package:task_manager_app/core/theme/theme_controller.dart';
 import 'package:task_manager_app/core/widgets/auth_wrapper.dart';
@@ -12,9 +13,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 2. Initialize Firebase
-  // This fixes the "[core/no-app] No Firebase App" crash.
-  // The AuthService accesses FirebaseAuth, so this must run before the UI builds.
-  await Firebase.initializeApp();
+  // Gracefully handle missing google-services.json for Offline/Guest Mode
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase initialization failed (Running in Offline Mode): $e');
+  }
 
   // 3. Initialize Database Core (Adapters & Prefs)
   await StorageService.instance.initialize();

@@ -108,6 +108,24 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: _handleGoogleSignIn,
                       ),
                     ),
+
+              const SizedBox(height: 20),
+
+              // 3. GUEST MODE BUTTON
+              if (!_isLoading)
+                TextButton(
+                  onPressed: () {
+                    AuthService.instance.enterGuestMode();
+                  },
+                  child: Text(
+                    "Continue as Guest",
+                    style: TextStyle(
+                      color: colors.textSecondary,
+                      fontSize: 14,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
